@@ -2,8 +2,8 @@ import socket
 import threading
 
 # Arrays de clientes e seus respectivos nomes
-clientes = []
-nomes = []
+CLIENTES = []
+NOMES = []
 host = 'localhost'
 port = 65521
 
@@ -16,10 +16,8 @@ server.listen()
 def conexao(cliente):
     while True:
         try:
+            # Recebe a mensagem de um cliente e a distribui para todos os clientes conectados (inclusive o cliente que enviou a mensagem)
             msg = cliente.recv(1024)
-            if (msg == 'sair'):
-                sair_do_chat(cliente)
-                break
             enviar_mensagem(msg)
         except:
             sair_do_chat(cliente)
@@ -28,27 +26,29 @@ def conexao(cliente):
 # Transmite a mensagem para todos os clientes
 def enviar_mensagem(msg):
     i = 0
-    while(i < len(clientes)):
-        clientes[i].send(msg)
+    while(i < len(CLIENTES)):
+        CLIENTES[i].send(msg)
         i += 1
 
+# Desconecta um cliente do chat
 def sair_do_chat(cliente):
-    i = clientes.index(cliente)
-    clientes.remove(cliente)
+    i = CLIENTES.index(cliente)
+    CLIENTES.remove(cliente)
     cliente.close()
-    nome = nomes[i]
+    nome = NOMES[i]
     enviar_mensagem(f'{nome} saiu do chat'.encode('utf-8'))
     print(f'Cliente "{nome}" se desconectou\n')
-    nomes.remove(nome)
+    NOMES.remove(nome)
 
-# Função servidor, que aceita novas conexões via socket e cria uma thread de conexão para cada cliente
+# Função servidor, que aceita novas conexões via sockets e cria uma thread de conexão para cada cliente
 def servidor():
     while True:
         cliente, endereco = server.accept()
         # Recebe o nome do cliente, logo após a conexão
         nome = cliente.recv(1024).decode('utf-8')
-        nomes.append(nome)
-        clientes.append(cliente)
+        # Guarda nas listas globais a referência do cliente conectado, tanto o objeto socket quanto o nome do cliente 
+        NOMES.append(nome)
+        CLIENTES.append(cliente)
         
         print(f'Cliente "{nome}" se conectou')
         print(f'Endereço: {str(endereco)}\n')
@@ -59,5 +59,6 @@ def servidor():
         # Inicia a thread de conexão do cliente
         thread_conexao = threading.Thread(target=conexao, args=(cliente,))
         thread_conexao.start()
-  
+
+# Inicia a função de servidor  
 servidor()
