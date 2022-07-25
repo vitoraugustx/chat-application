@@ -58,8 +58,8 @@ def receber_mensagem():
         try:
             # Recebe a mensagem do servidor e decodifica
             mensagem = CLIENTE.recv(1024).decode('utf-8')
-            # Tratamento para exibir 'Você' ao invés do próprio nome na mensagem
             DISPLAY_MENSAGENS.config(state=tk.NORMAL)
+            # Tratamento para exibir 'Você' ao invés do próprio nome na mensagem
             if (NOME == mensagem[0 : len(NOME)]):
                 mensagem = mensagem.replace(mensagem[0 : len(NOME)], 'Você', 1)
                 DISPLAY_MENSAGENS.insert(tk.END, mensagem + '\n', "cor_mensagem")

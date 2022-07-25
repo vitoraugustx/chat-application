@@ -13,6 +13,7 @@ server.bind((host, port))
 server.listen()
 
 # Função que roda na thread de conexão dos clientes
+# Parâmetro 'cliente' é a referência ao objeto socket do cliente, cada thread de conexão leva a referência de um socket cliente
 def conexao(cliente):
     while True:
         try:
@@ -54,6 +55,7 @@ def servidor():
         print(f'Endereço: {str(endereco)}\n')
         # Informa a conexão de um usuário para os outros usuários
         enviar_mensagem(f'{nome} entrou no chat'.encode('utf-8'))
+        # Informa o cliente que o mesmo está conectado ao chat
         cliente.send('Conectado ao chat\n'.encode('utf-8'))
 
         # Inicia a thread de conexão do cliente
