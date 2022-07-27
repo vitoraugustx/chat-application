@@ -23,8 +23,6 @@ nome_input.grid(column=1, row=2, sticky=tk.E, padx=20, pady=5)
 entrar_btn = tk.Button(janela_inicial, text="  Entrar  ", command = lambda : entrar())
 entrar_btn.grid(column=1, row=3, sticky=tk.E, padx=20, pady=5)
 
-
-
 # Variáveis globais
 NOME = None
 CLIENTE = None
@@ -32,7 +30,7 @@ JANELA_CHAT = None
 FRAME_MENSAGENS = None
 DISPLAY_MENSAGENS = None
 
-# host e porta para a conexão via sockets
+# host e porta para a conexão via socket
 host = 'localhost'
 port = 65521
 
@@ -44,15 +42,17 @@ def enviar_mensagem(mensagem):
     if (mensagem == ''):
         tk.messagebox.showerror(title="Erro", message="Insira uma mensagem válida")
     else: 
+        # Envia a mensagem para o socket do servidor
         mensagem = (f'{NOME}: {mensagem}')
         CLIENTE.send(mensagem.encode('utf-8'))
+        # Esvazia a entrada de dados da interface de usuário ao enviar
         mensagem_input.delete('1.0', tk.END)
 
 # Função que recebe mensagens do servidor
 def receber_mensagem():
     time.sleep(1)
     global CLIENTE, NOME, DISPLAY_MENSAGENS
-    # Envia seu nome ao servidor apenas uma vez, após a conexão
+    # Envia seu nome ao servidor apenas uma vez, após a conexão 
     CLIENTE.send(NOME.encode('utf-8'))
     while True:
         try:
@@ -61,9 +61,11 @@ def receber_mensagem():
             DISPLAY_MENSAGENS.config(state=tk.NORMAL)
             # Tratamento para exibir 'Você' ao invés do próprio nome na mensagem
             if (NOME == mensagem[0 : len(NOME)]):
+                # Exibe as mensagens do próprio usuário
                 mensagem = mensagem.replace(mensagem[0 : len(NOME)], 'Você', 1)
                 DISPLAY_MENSAGENS.insert(tk.END, mensagem + '\n', "cor_mensagem")
             else:
+                # Exibe as mensagens de outros usuários
                 DISPLAY_MENSAGENS.insert(tk.END, mensagem + '\n', "cor_mensagem")
             DISPLAY_MENSAGENS.config(state=tk.DISABLED)
             DISPLAY_MENSAGENS.see(tk.END)
@@ -106,7 +108,6 @@ def abrir_janela_chat():
     DISPLAY_MENSAGENS.config(yscrollcommand=barra_rolagem.set, background="#2a2a2a", highlightbackground="grey", state="disabled")
     FRAME_MENSAGENS.pack(side=tk.TOP)
 
-
     bottomFrame = tk.Frame(JANELA_CHAT)
     mensagem_input = tk.Text(bottomFrame, height=1, width=55)
     mensagem_input.pack(side=tk.LEFT, padx=(5, 13), pady=(5, 10))
@@ -114,6 +115,7 @@ def abrir_janela_chat():
     mensagem_input.bind("<Return>", (lambda event: enviar_mensagem(mensagem_input.get("1.0", tk.END))))
     bottomFrame.pack(side=tk.BOTTOM)  
 
+    # Chama a função 'fechar_janela_chat' (que desconecta o cliente) ao usuário fechar a janela do chat
     JANELA_CHAT.protocol("WM_DELETE_WINDOW", fechar_janela_chat)
     JANELA_CHAT.mainloop()
 
@@ -131,8 +133,9 @@ def fechar_janela_chat():
 def conectar_servidor():
     global CLIENTE
     try:
-        # Conecta ao servidor por meio de sockets
+        # Instancia o cliente como um objeto socket
         CLIENTE = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Conecta ao servidor por meio do seu socket
         CLIENTE.connect((host, port))
 
         # Thread que recebe as mensagens do servidor
@@ -142,7 +145,7 @@ def conectar_servidor():
         return True
     except Exception as e:
         # Retorna falso caso a aplicação não consiga se conectar com o servidor
-        tk.messagebox.showerror(title="Erro", message="Servidor offline")
+        tk.messagebox.showerror(title="Erro", message="Erro ao se conectar com o servidor")
         return False
 
 # Chama a janela inicial que pede o nome do usuário para prosseguir para a conexão com o chat

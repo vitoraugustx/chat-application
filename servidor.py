@@ -7,7 +7,7 @@ NOMES = []
 host = 'localhost'
 port = 65521
 
-# Inicia o servidor no host e porta
+# Instancia o socket do servidor no host e porta
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((host, port))
 server.listen()
@@ -53,7 +53,7 @@ def servidor():
         
         print(f'Cliente "{nome}" se conectou')
         print(f'Endereço: {str(endereco)}\n')
-        # Informa a conexão de um usuário para os outros usuários
+        # Informa a conexão de um usuário para os outros usuários conectados ao chat
         enviar_mensagem(f'{nome} entrou no chat'.encode('utf-8'))
         # Informa o cliente que o mesmo está conectado ao chat
         cliente.send('Conectado ao chat\n'.encode('utf-8'))
